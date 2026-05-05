@@ -12,6 +12,27 @@ const Campaign = require('../models/Campaign');
 const { User } = require('../models/User');
 const { sendSubscriptionConfirmationEmail } = require('../utils/emailService');
 
+// @route   GET /api/stripe/plans
+// @desc    Public list of available plans
+// @access  Public
+// NOTE: keep this above any auth middleware so anonymous visitors can fetch plans.
+router.get('/plans', async (req, res) => {
+  try {
+    const docs = await Plan.find().sort({ monthlyPrice: 1 });
+    const plans = docs.map(d => {
+      const o = d.toObject();
+      o.id = o._id.toString();
+      delete o._id;
+      delete o.__v;
+      return o;
+    });
+    res.json(plans);
+  } catch (err) {
+    console.error('Error fetching plans:', err);
+    res.status(500).json({ message: 'Server error' });
+  }
+});
+
 // @route   POST /api/stripe/create-checkout-session
 // @desc    Create a Stripe checkout session
 // @access  Private

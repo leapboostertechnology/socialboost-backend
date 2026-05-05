@@ -32,7 +32,15 @@ const sendEmail = async (options) => {
         console.log('Copy this URL to reset password in development');
       }
     }
-    
+
+    // For login OTP emails, log the 6-digit OTP for dev/automation
+    if (options.subject && options.subject.toLowerCase().includes('verification code')) {
+      const m = options.html && options.html.match(/>\s*(\d{6})\s*</);
+      if (m && m[1]) {
+        console.log(`\n🔑 LOGIN OTP: ${m[1]}\n`);
+      }
+    }
+
     console.log('==========================================\n');
     return; // Skip actual sending
   }
